@@ -1,4 +1,6 @@
 node_modules/
 dist/
 dist-inline/
+dist-preview/
+dist-single/
 *.local
