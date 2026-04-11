@@ -1,50 +1,24 @@
-import { Heart, MessageSquare, Image, Calendar, MoreVertical } from 'lucide-react'
-import type { TabGroup } from '../../config/spaceConfig'
+export type TabId = 'home' | 'vendors' | 'budget' | 'schedule' | 'docs'
 
-interface BottomTabItem {
-  id: TabGroup
-  label: string
-  icon: string
-}
+const TABS: { id: TabId; label: string; emoji: string }[] = [
+  { id: 'home', label: '홈', emoji: '🏠' },
+  { id: 'vendors', label: '업체', emoji: '🏢' },
+  { id: 'budget', label: '예산', emoji: '💰' },
+  { id: 'schedule', label: '일정', emoji: '📅' },
+  { id: 'docs', label: '문서함', emoji: '📁' },
+]
 
-interface BottomNavProps {
-  tabs: BottomTabItem[]
-  active: TabGroup
-  onChange: (tab: TabGroup) => void
-}
-
-const ICONS: Record<string, typeof Heart> = {
-  heart: Heart,
-  chat: MessageSquare,
-  image: Image,
-  calendar: Calendar,
-  more: MoreVertical,
-}
-
-export default function BottomNav({ tabs, active, onChange }: BottomNavProps) {
+export default function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
   return (
-    <nav className="bottom-nav-glass fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] flex justify-around items-center px-1 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] z-50 border-t border-teal/5">
-      {tabs.map(({ id, label, icon }) => {
-        const Icon = ICONS[icon] || Heart
-        return (
-          <button
-            key={id}
-            onClick={() => onChange(id)}
-            className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1.5 text-[9px] font-bold transition-all duration-300 relative
-              ${active === id ? 'text-teal' : 'text-gray-400'}`}
-          >
-            <Icon
-              size={22}
-              strokeWidth={active === id ? 2.5 : 1.8}
-              className={`transition-all duration-300 ${active === id ? 'scale-110' : ''}`}
-            />
-            <span>{label}</span>
-            {active === id && (
-              <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-teal shadow-[0_0_6px_rgba(56,178,172,0.4)]" />
-            )}
-          </button>
-        )
-      })}
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-stone-100 flex items-center justify-around pb-5 pt-2 z-50">
+      {TABS.map(t => (
+        <button key={t.id} onClick={() => onChange(t.id)}
+          className={`flex flex-col items-center gap-0.5 transition-opacity ${active === t.id ? 'opacity-100' : 'opacity-30'}`}>
+          <span className="text-lg">{t.emoji}</span>
+          <span className="text-[9px] font-bold tracking-wide">{t.label}</span>
+          {active === t.id && <span className="w-1 h-1 rounded-full bg-stone-900 mt-0.5" />}
+        </button>
+      ))}
     </nav>
   )
 }
