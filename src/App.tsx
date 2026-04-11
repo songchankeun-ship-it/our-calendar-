@@ -3,16 +3,10 @@ import { WeddingProvider, useWedding } from './contexts/WeddingContext'
 import BottomNav, { type TabId } from './components/layout/BottomNav'
 import Onboarding from './components/onboarding/Onboarding'
 import Home from './components/home/Home'
-
-function Placeholder({ title, emoji }: { title: string; emoji: string }) {
-  return (
-    <div className="pb-24 px-5 pt-4 text-center">
-      <div className="text-4xl mb-3 mt-16">{emoji}</div>
-      <div className="text-lg font-extrabold mb-1">{title}</div>
-      <div className="text-sm text-stone-400">곧 만들어질 화면이에요</div>
-    </div>
-  )
-}
+import Vendors from './components/vendors/Vendors'
+import Budget from './components/budget/Budget'
+import Schedule from './components/schedule/Schedule'
+import Documents from './components/documents/Documents'
 
 function AppContent() {
   const { data } = useWedding()
@@ -26,10 +20,10 @@ function AppContent() {
   const renderTab = () => {
     switch (tab) {
       case 'home': return <Home onTabChange={(t) => setTab(t as TabId)} />
-      case 'vendors': return <Placeholder title="업체 관리" emoji="🏢" />
-      case 'budget': return <Placeholder title="예산 관리" emoji="💰" />
-      case 'schedule': return <Placeholder title="일정" emoji="📅" />
-      case 'docs': return <Placeholder title="문서함" emoji="📁" />
+      case 'vendors': return <Vendors />
+      case 'budget': return <Budget />
+      case 'schedule': return <Schedule />
+      case 'docs': return <Documents />
       default: return <Home onTabChange={(t) => setTab(t as TabId)} />
     }
   }
