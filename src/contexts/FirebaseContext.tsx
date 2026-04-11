@@ -97,7 +97,9 @@ export function FirebaseProvider({ children }: { children: ReactNode }) {
   const saveData = useCallback((newData: CoupleData) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newData))
     if (db && roomName) {
-      set(ref(db, `rooms/${roomName}`), newData).catch(console.error)
+      // Firebase doesn't accept undefined values - strip them
+      const clean = JSON.parse(JSON.stringify(newData))
+      set(ref(db, `rooms/${roomName}`), clean).catch(console.error)
     }
   }, [db, roomName])
 
