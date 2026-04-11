@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>결혼준비 워크스페이스 — 와이어프레임</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard Variable',sans-serif; background:#F5F3EF; color:#1a1a18; }
+
+/* Shell */
+.shell { max-width:390px; margin:40px auto; background:#fff; border-radius:32px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.12); position:relative; min-height:844px; }
+.status-bar { height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; font-size:12px; font-weight:600; color:#1a1a18; }
+.status-bar .time { font-weight:700; }
+
+/* Screen selector */
+.screen-nav { position:fixed; top:20px; right:20px; z-index:100; background:#fff; border-radius:16px; padding:12px; box-shadow:0 8px 32px rgba(0,0,0,0.12); max-height:90vh; overflow-y:auto; width:200px; }
+.screen-nav h3 { font-size:12px; color:#999; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+.screen-nav button { display:block; width:100%; text-align:left; padding:8px 12px; border:none; background:none; font-size:13px; font-family:inherit; cursor:pointer; border-radius:8px; color:#555; transition:all .15s; margin-bottom:2px; }
+.screen-nav button:hover { background:#f5f3ef; }
+.screen-nav button.active { background:#1a1a18; color:#fff; font-weight:600; }
+.screen-nav .divider { height:1px; background:#eee; margin:8px 0; }
+
+/* Screen container */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* Bottom Nav */
+.bottom-nav { position:absolute; bottom:0; left:0; right:0; height:80px; background:#fff; border-top:1px solid #f0ede8; display:flex; align-items:center; justify-content:space-around; padding-bottom:16px; }
+.bottom-nav .nav-item { text-align:center; cursor:pointer; opacity:.4; transition:all .2s; }
+.bottom-nav .nav-item.active { opacity:1; }
+.bottom-nav .nav-item .icon { font-size:20px; margin-bottom:2px; }
+.bottom-nav .nav-item .label { font-size:10px; font-weight:600; }
+
+/* Common */
+.px { padding-left:20px; padding-right:20px; }
+.card { background:#fff; border:1px solid #f0ede8; border-radius:16px; padding:16px; margin-bottom:12px; }
+.card-flat { background:#f8f6f2; border-radius:16px; padding:16px; margin-bottom:12px; }
+.section-title { font-size:13px; font-weight:700; color:#999; margin-bottom:12px; text-transform:uppercase; letter-spacing:.5px; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge-green { background:#E8F5E9; color:#2E7D32; }
+.badge-blue { background:#E3F2FD; color:#1565C0; }
+.badge-amber { background:#FFF8E1; color:#F57F17; }
+.badge-red { background:#FFEBEE; color:#C62828; }
+.badge-gray { background:#F5F5F5; color:#757575; }
+.badge-purple { background:#F3E5F5; color:#6A1B9A; }
+.progress-bar { height:6px; background:#f0ede8; border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:3px; transition:width .6s ease; }
+.divider { height:1px; background:#f0ede8; margin:16px 0; }
+.fab { position:absolute; bottom:96px; right:20px; width:52px; height:52px; border-radius:16px; background:#1a1a18; color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 4px 16px rgba(0,0,0,0.2); cursor:pointer; }
+
+/* Onboarding */
+.onboard-hero { text-align:center; padding:60px 32px 40px; }
+.onboard-hero .emoji { font-size:64px; margin-bottom:16px; }
+.onboard-hero h1 { font-size:24px; font-weight:800; margin-bottom:8px; line-height:1.3; }
+.onboard-hero p { font-size:14px; color:#888; line-height:1.6; }
+.input-group { margin-bottom:16px; }
+.input-group label { display:block; font-size:12px; font-weight:600; color:#888; margin-bottom:6px; }
+.input-field { width:100%; padding:14px 16px; border:2px solid #f0ede8; border-radius:12px; font-size:15px; font-family:inherit; outline:none; transition:border .2s; }
+.input-field:focus { border-color:#1a1a18; }
+.btn-primary { width:100%; padding:16px; border:none; border-radius:14px; background:#1a1a18; color:#fff; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; transition:transform .1s; }
+.btn-primary:active { transform:scale(.97); }
+.btn-secondary { width:100%; padding:14px; border:2px solid #f0ede8; border-radius:14px; background:#fff; color:#888; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; }
+
+/* Home Dashboard */
+.dday-hero { background:linear-gradient(135deg,#1a1a18,#2d2d2a); border-radius:20px; padding:28px 24px; color:#fff; text-align:center; margin-bottom:16px; }
+.dday-hero .dday-num { font-size:48px; font-weight:800; letter-spacing:-2px; line-height:1; }
+.dday-hero .dday-label { font-size:12px; opacity:.6; margin-top:4px; letter-spacing:2px; }
+.dday-hero .dday-date { font-size:13px; opacity:.8; margin-top:8px; }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.stat-card { background:#f8f6f2; border-radius:14px; padding:14px; }
+.stat-card .stat-label { font-size:11px; color:#999; font-weight:600; margin-bottom:4px; }
+.stat-card .stat-value { font-size:18px; font-weight:800; }
+.stat-card .stat-sub { font-size:11px; color:#999; margin-top:2px; }
+.todo-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #f5f3ef; }
+.todo-item:last-child { border:none; }
+.todo-check { width:22px; height:22px; border-radius:6px; border:2px solid #ddd; flex-shrink:0; }
+.todo-check.done { background:#1a1a18; border-color:#1a1a18; }
+.todo-text { font-size:14px; font-weight:500; flex:1; }
+.todo-text.done { text-decoration:line-through; color:#bbb; }
+.todo-badge { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:600; }
+
+/* Budget */
+.budget-summary { background:#f8f6f2; border-radius:16px; padding:20px; margin-bottom:16px; text-align:center; }
+.budget-total { font-size:11px; color:#999; font-weight:600; }
+.budget-amount { font-size:32px; font-weight:800; margin:4px 0; }
+.budget-row { display:flex; justify-content:space-around; margin-top:12px; }
+.budget-col { text-align:center; }
+.budget-col .val { font-size:16px; font-weight:700; }
+.budget-col .lbl { font-size:10px; color:#999; font-weight:600; margin-top:2px; }
+.budget-cat { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #f5f3ef; }
+.budget-cat:last-child { border:none; }
+.budget-cat .cat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+.budget-cat .cat-info { flex:1; }
+.budget-cat .cat-name { font-size:14px; font-weight:600; }
+.budget-cat .cat-bar { height:4px; background:#f0ede8; border-radius:2px; margin-top:6px; }
+.budget-cat .cat-fill { height:100%; border-radius:2px; }
+.budget-cat .cat-amount { text-align:right; }
+.budget-cat .cat-spent { font-size:14px; font-weight:700; }
+.budget-cat .cat-planned { font-size:11px; color:#999; }
+
+/* Vendor CRM */
+.vendor-filters { display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px; }
+.vendor-filter { padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid #e8e5e0; background:#fff; white-space:nowrap; cursor:pointer; }
+.vendor-filter.active { background:#1a1a18; color:#fff; border-color:#1a1a18; }
+.vendor-card { border:1px solid #f0ede8; border-radius:16px; padding:16px; margin-bottom:10px; }
+.vendor-card .vc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.vendor-card .vc-name { font-size:15px; font-weight:700; }
+.vendor-card .vc-cat { font-size:11px; color:#999; font-weight:500; }
+.vendor-card .vc-meta { display:flex; gap:16px; font-size:12px; color:#777; margin-bottom:10px; }
+.vendor-card .vc-quote { font-size:16px; font-weight:700; }
+.vendor-card .vc-note { font-size:12px; color:#999; margin-top:6px; line-height:1.5; }
+.pipeline-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+
+/* Timeline */
+.month-header { font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.month-header .month-badge { font-size:11px; padding:3px 10px; border-radius:10px; background:#f0ede8; color:#777; font-weight:600; }
+.timeline-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f8f6f2; }
+.timeline-item:last-child { border:none; }
+.tl-check { width:20px; height:20px; border-radius:50%; border:2px solid #ddd; flex-shrink:0; margin-top:2px; }
+.tl-check.done { background:#2E7D32; border-color:#2E7D32; }
+.tl-check.in-progress { border-color:#F57F17; background:#FFF8E1; }
+.tl-content { flex:1; }
+.tl-title { font-size:14px; font-weight:600; }
+.tl-title.done { text-decoration:line-through; color:#bbb; }
+.tl-sub { font-size:11px; color:#999; margin-top:2px; }
+.tl-assignee { font-size:10px; padding:2px 8px; border-radius:10px; background:#f0ede8; color:#777; font-weight:600; }
+
+/* Vendor Detail */
+.vd-header { padding:20px 20px 16px; }
+.vd-name { font-size:22px; font-weight:800; }
+.vd-cat { font-size:13px; color:#999; margin-top:2px; }
+.vd-status { margin-top:8px; }
+.status-pipeline { display:flex; gap:3px; margin-top:12px; }
+.status-step { height:4px; flex:1; border-radius:2px; background:#f0ede8; }
+.status-step.filled { background:#1a1a18; }
+.vd-section { padding:0 20px; margin-bottom:20px; }
+.vd-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f8f6f2; font-size:14px; }
+.vd-row:last-child { border:none; }
+.vd-label { color:#999; font-weight:500; }
+.vd-value { font-weight:600; }
+.vd-note { background:#f8f6f2; border-radius:12px; padding:14px; font-size:13px; color:#555; line-height:1.6; }
+
+/* Activity */
+.activity-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #f8f6f2; }
+.activity-item:last-child { border:none; }
+.act-avatar { width:32px; height:32px; border-radius:50%; background:#f0ede8; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+.act-content { flex:1; }
+.act-text { font-size:13px; line-height:1.5; }
+.act-text strong { font-weight:700; }
+.act-time { font-size:11px; color:#bbb; margin-top:2px; }
+
+/* Alert */
+.alert { border-radius:12px; padding:12px 14px; margin-bottom:12px; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; }
+.alert-warn { background:#FFF8E1; color:#E65100; }
+.alert-info { background:#E3F2FD; color:#1565C0; }
+</style>
+</head>
+<body>
+
+<!-- Screen Navigator -->
+<div class="screen-nav" id="screenNav">
+  <h3>Screens</h3>
+  <button class="active" onclick="showScreen('onboarding')">1. 온보딩</button>
+  <button onclick="showScreen('home')">2. 홈 대시보드</button>
+  <button onclick="showScreen('budget')">3. 예산 관리</button>
+  <button onclick="showScreen('vendors')">4. 업체 목록</button>
+  <button onclick="showScreen('vendor-detail')">5. 업체 상세</button>
+  <button onclick="showScreen('timeline')">6. 타임라인</button>
+  <button onclick="showScreen('activity')">7. 활동 로그</button>
+</div>
+
+<!-- Phone Shell -->
+<div class="shell">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span>●●● Wi-Fi 📶 🔋</span>
+  </div>
+
+  <!-- ==================== SCREEN 1: ONBOARDING ==================== -->
+  <div class="screen active" id="screen-onboarding">
+    <div class="onboard-hero">
+      <div class="emoji">💒</div>
+      <h1>결혼준비,<br>프로젝트처럼.</h1>
+      <p>예산, 업체, 일정을 한곳에서.<br>둘이 함께 운영하세요.</p>
+    </div>
+    <div class="px" style="padding-bottom:40px">
+      <div class="input-group">
+        <label>예식 예정일</label>
+        <input type="date" class="input-field" value="2027-03-20">
+      </div>
+      <div class="input-group">
+        <label>내 이름</label>
+        <input type="text" class="input-field" placeholder="이름 또는 닉네임" value="서윤">
+      </div>
+      <div class="input-group">
+        <label>총 예산 (선택)</label>
+        <input type="text" class="input-field" placeholder="예: 4,000만원" value="4,000만원">
+      </div>
+      <div style="margin-top:24px">
+        <button class="btn-primary" onclick="showScreen('home')">시작하기</button>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn-secondary">파트너 초대는 나중에</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 2: HOME DASHBOARD ==================== -->
+  <div class="screen" id="screen-home">
+    <div class="px" style="padding-top:8px; padding-bottom:100px;">
+      <!-- D-day -->
+      <div class="dday-hero">
+        <div class="dday-num">D-342</div>
+        <div class="dday-label">WEDDING DAY</div>
+        <div class="dday-date">2027. 03. 20 (토) · 서윤 & 촨근</div>
+      </div>
+
+      <!-- Budget Summary -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">총 예산</div>
+          <div class="stat-value">4,000만</div>
+          <div class="stat-sub">확정 1,250만</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">잔여 예산</div>
+          <div class="stat-value" style="color:#2E7D32">2,750만</div>
+          <div class="stat-sub">68.8% 남음</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">업체 현황</div>
+          <div class="stat-value">7곳</div>
+          <div class="stat-sub">계약 2 · 비교 3</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">체크리스트</div>
+          <div class="stat-value">18%</div>
+          <div class="stat-sub">8 / 44 완료</div>
+        </div>
+      </div>
+
+      <!-- Budget Alert -->
+      <div class="alert alert-warn">
+        ⚠️ 스드메 카테고리 예산이 50만원 초과되었어요
+      </div>
+
+      <!-- This week todos -->
+      <div class="section-title">이번 주 할 일</div>
+      <div class="card">
+        <div class="todo-item">
+          <div class="todo-check done"></div>
+          <div class="todo-text done">웨딩홀 투어 3곳</div>
+          <span class="todo-badge badge-green">완료</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">스드메 상담 예약</div>
+          <span class="todo-badge" style="background:#E3F2FD;color:#1565C0">신부</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">예복 매장 리서치</div>
+          <span class="todo-badge" style="background:#FFF3E0;color:#E65100">신랑</span>
+        </div>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="section-title">최근 활동</div>
+      <div class="card-flat">
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#E3F2FD;color:#1565C0">촨</div>
+          <div class="act-content">
+            <div class="act-text"><strong>촨근</strong>님이 <strong>더클래식500</strong> 견적을 추가했어요</div>
+            <div class="act-time">10분 전</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#FCE4EC;color:#C62828">서</div>
+          <div class="act-content">
+            <div class="act-text"><strong>서윤</strong>님이 웨딩홀 투어를 완료했어요 ✓</div>
+            <div class="act-time">2시간 전</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="icon">🏠</div><div class="label">홈</div></div>
+      <div class="nav-item" onclick="showScreen('timeline')"><div class="icon">✅</div><div class="label">타임라인</div></div>
+      <div class="nav-item" onclick="showScreen('budget')"><div class="icon">💰</div><div class="label">예산</div></div>
+      <div class="nav-item" onclick="showScreen('vendors')"><div class="icon">🏢</div><div class="label">업체</div></div>
+      <div class="nav-item"><div class="icon">⚙️</div><div class="label">더보기</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 3: BUDGET ==================== -->
+  <div class="screen" id="screen-budget">
+    <div class="px" style="padding-top:8px; padding-bottom:100px;">
+      <div style="font-size:20px;font-weight:800;margin-bottom:16px">💰 예산 관리</div>
+
+      <div class="budget-summary">
+        <div class="budget-total">총 예산</div>
+        <div class="budget-amount">4,000만원</div>
+        <div class="progress-bar" style="margin:12px 0">
+          <div class="progress-fill" style="width:31.3%;background:linear-gradient(90deg,#1a1a18,#555)"></div>
+        </div>
+        <div class="budget-row">
+          <div class="budget-col"><div class="val" style="color:#1a1a18">1,250만</div><div class="lbl">확정</div></div>
+          <div class="budget-col"><div class="val" style="color:#F57F17">350만</div><div class="lbl">계약금 납부</div></div>
+          <div class="budget-col"><div class="val" style="color:#2E7D32">2,750만</div><div class="lbl">잔여</div></div>
+        </div>
+      </div>
+
+      <div class="alert alert-warn">⚠️ 스드메 50만원 초과 · 전체 예산 여유: 68.8%</div>
+
+      <div class="section-title">카테고리별</div>
+
+      <div class="budget-cat">
+        <div class="cat-icon" style="background:#FFEBEE">🏛️</div>
+        <div class="cat-info">
+          <div class="cat-name">웨딩홀</div>
+          <div class="cat-bar"><div class="cat-fill" style="width:80%;background:#C62828"></div></div>
+        </div>
+        <div class="cat-amount">
+          <div class="cat-spent">1,200만</div>
+          <div class="cat-planned">/ 1,500만</div>
+        </div>
+      </div>
+
+      <div class="budget-cat">
+        <div class="cat-icon" style="background:#FFF3E0">📸</div>
+        <div class="cat-info">
+          <div class="cat-name">스드메</div>
+          <div class="cat-bar"><div class="cat-fill" style="width:117%;background:#E65100"></div></div>
+        </div>
+        <div class="cat-amount">
+          <div class="cat-spent" style="color:#C62828">350만</div>
+          <div class="cat-planned">/ 300만 <span style="color:#C62828;font-weight:700">+50만</span></div>
+        </div>
+      </div>
+
+      <div class="budget-cat">
+        <div class="cat-icon" style="background:#E8F5E9">🤵</div>
+        <div class="cat-info">
+          <div class="cat-name">예복</div>
+          <div class="cat-bar"><div class="cat-fill" style="width:0%"></div></div>
+        </div>
+        <div class="cat-amount">
+          <div class="cat-spent" style="color:#bbb">0</div>
+          <div class="cat-planned">/ 150만</div>
+        </div>
+      </div>
+
+      <div class="budget-cat">
+        <div class="cat-icon" style="background:#E3F2FD">💍</div>
+        <div class="cat-info">
+          <div class="cat-name">예물/예단</div>
+          <div class="cat-bar"><div class="cat-fill" style="width:0%"></div></div>
+        </div>
+        <div class="cat-amount">
+          <div class="cat-spent" style="color:#bbb">0</div>
+          <div class="cat-planned">/ 500만</div>
+        </div>
+      </div>
+
+      <div class="budget-cat">
+        <div class="cat-icon" style="background:#F3E5F5">✈️</div>
+        <div class="cat-info">
+          <div class="cat-name">신혼여행</div>
+          <div class="cat-bar"><div class="cat-fill" style="width:0%"></div></div>
+        </div>
+        <div class="cat-amount">
+          <div class="cat-spent" style="color:#bbb">0</div>
+          <div class="cat-planned">/ 500만</div>
+        </div>
+      </div>
+
+      <div class="budget-cat">
+        <div class="cat-icon" style="background:#FFF8E1">📋</div>
+        <div class="cat-info">
+          <div class="cat-name">기타</div>
+          <div class="cat-bar"><div class="cat-fill" style="width:0%"></div></div>
+        </div>
+        <div class="cat-amount">
+          <div class="cat-spent" style="color:#bbb">0</div>
+          <div class="cat-planned">/ 300만</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fab">+</div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')"><div class="icon">🏠</div><div class="label">홈</div></div>
+      <div class="nav-item" onclick="showScreen('timeline')"><div class="icon">✅</div><div class="label">타임라인</div></div>
+      <div class="nav-item active"><div class="icon">💰</div><div class="label">예산</div></div>
+      <div class="nav-item" onclick="showScreen('vendors')"><div class="icon">🏢</div><div class="label">업체</div></div>
+      <div class="nav-item"><div class="icon">⚙️</div><div class="label">더보기</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 4: VENDORS ==================== -->
+  <div class="screen" id="screen-vendors">
+    <div class="px" style="padding-top:8px; padding-bottom:100px;">
+      <div style="font-size:20px;font-weight:800;margin-bottom:16px">🏢 업체 관리</div>
+
+      <div class="vendor-filters">
+        <div class="vendor-filter active">전체 7</div>
+        <div class="vendor-filter">웨딩홀 3</div>
+        <div class="vendor-filter">스드메 2</div>
+        <div class="vendor-filter">예복 1</div>
+        <div class="vendor-filter">스냅 1</div>
+      </div>
+
+      <div class="vendor-card" onclick="showScreen('vendor-detail')" style="cursor:pointer">
+        <div class="vc-top">
+          <div>
+            <div class="vc-name">더클래식500</div>
+            <div class="vc-cat">웨딩홀</div>
+          </div>
+          <span class="badge badge-green"><span class="pipeline-dot" style="background:#2E7D32"></span>계약완료</span>
+        </div>
+        <div class="vc-meta">
+          <span>📅 4/12 상담</span>
+          <span>👤 김담당</span>
+        </div>
+        <div class="vc-quote">1,200만원</div>
+        <div class="vc-note">120명 기준 식대 7만. 토요일 점심 확보. 분위기 좋음.</div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vc-top">
+          <div>
+            <div class="vc-name">라브르 드에드니아</div>
+            <div class="vc-cat">웨딩홀</div>
+          </div>
+          <span class="badge badge-amber"><span class="pipeline-dot" style="background:#F57F17"></span>비교중</span>
+        </div>
+        <div class="vc-meta">
+          <span>📅 4/15 상담예정</span>
+          <span>👤 박매니저</span>
+        </div>
+        <div class="vc-quote">1,400만원</div>
+        <div class="vc-note">식대 8만. 분위기 고급. 주차 불편.</div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vc-top">
+          <div>
+            <div class="vc-name">로이스튜디오</div>
+            <div class="vc-cat">스튜디오</div>
+          </div>
+          <span class="badge badge-blue"><span class="pipeline-dot" style="background:#1565C0"></span>견적받음</span>
+        </div>
+        <div class="vc-meta">
+          <span>📅 4/20 상담</span>
+          <span>👤 이실장</span>
+        </div>
+        <div class="vc-quote">180만원</div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vc-top">
+          <div>
+            <div class="vc-name">벨라주드레스</div>
+            <div class="vc-cat">드레스</div>
+          </div>
+          <span class="badge badge-purple"><span class="pipeline-dot" style="background:#6A1B9A"></span>상담완료</span>
+        </div>
+        <div class="vc-meta">
+          <span>📅 4/18 상담완료</span>
+        </div>
+        <div class="vc-quote">120만원</div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vc-top">
+          <div>
+            <div class="vc-name">그랜드하얏트</div>
+            <div class="vc-cat">웨딩홀</div>
+          </div>
+          <span class="badge badge-gray"><span class="pipeline-dot" style="background:#999"></span>보류</span>
+        </div>
+        <div class="vc-meta">
+          <span>📅 4/10 상담</span>
+        </div>
+        <div class="vc-quote">2,200만원</div>
+        <div class="vc-note">예산 초과. 날짜도 안 맞음.</div>
+      </div>
+    </div>
+
+    <div class="fab">+</div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')"><div class="icon">🏠</div><div class="label">홈</div></div>
+      <div class="nav-item" onclick="showScreen('timeline')"><div class="icon">✅</div><div class="label">타임라인</div></div>
+      <div class="nav-item" onclick="showScreen('budget')"><div class="icon">💰</div><div class="label">예산</div></div>
+      <div class="nav-item active"><div class="icon">🏢</div><div class="label">업체</div></div>
+      <div class="nav-item"><div class="icon">⚙️</div><div class="label">더보기</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 5: VENDOR DETAIL ==================== -->
+  <div class="screen" id="screen-vendor-detail">
+    <div style="padding-top:8px; padding-bottom:100px;">
+      <div class="px" style="margin-bottom:8px">
+        <span style="font-size:13px;color:#999;cursor:pointer" onclick="showScreen('vendors')">← 업체 목록</span>
+      </div>
+
+      <div class="vd-header">
+        <div class="vd-name">더클래식500</div>
+        <div class="vd-cat">웨딩홀 · 서울 강남</div>
+        <div class="vd-status">
+          <span class="badge badge-green">계약 완료</span>
+        </div>
+        <div class="status-pipeline">
+          <div class="status-step filled"></div>
+          <div class="status-step filled"></div>
+          <div class="status-step filled"></div>
+          <div class="status-step filled"></div>
+          <div class="status-step filled"></div>
+          <div class="status-step filled"></div>
+          <div class="status-step"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:4px;padding:0 2px">
+          <span>관심</span><span>상담</span><span>견적</span><span>비교</span><span>계약</span><span>완료</span><span>보류</span>
+        </div>
+      </div>
+
+      <div class="vd-section">
+        <div class="section-title">기본 정보</div>
+        <div class="vd-row"><span class="vd-label">담당자</span><span class="vd-value">김담당</span></div>
+        <div class="vd-row"><span class="vd-label">연락처</span><span class="vd-value">02-1234-5678</span></div>
+        <div class="vd-row"><span class="vd-label">상담일</span><span class="vd-value">2026. 04. 12</span></div>
+        <div class="vd-row"><span class="vd-label">견적</span><span class="vd-value" style="font-size:16px">1,200만원</span></div>
+      </div>
+
+      <div class="vd-section">
+        <div class="section-title">예산 연동</div>
+        <div class="vd-row"><span class="vd-label">계약금</span><span class="vd-value">300만원 <span class="badge badge-green" style="font-size:10px">납부완료</span></span></div>
+        <div class="vd-row"><span class="vd-label">잔금</span><span class="vd-value">900만원 <span style="color:#999;font-size:12px">11/01까지</span></span></div>
+        <div class="vd-row"><span class="vd-label">추가금</span><span class="vd-value" style="color:#C62828">+50만원</span></div>
+      </div>
+
+      <div class="vd-section">
+        <div class="section-title">메모</div>
+        <div class="vd-note">
+          120명 기준 식대 7만원. 토요일 점심 확보됨.<br>
+          분위기 좋고 접근성 좋음. 발렛 무료.<br>
+          추가금: 빔프로젝터 30만 + 꽃장식 업그레이드 20만
+        </div>
+      </div>
+
+      <div class="vd-section">
+        <div class="section-title">첨부 파일</div>
+        <div style="display:flex;gap:8px">
+          <div style="width:64px;height:64px;background:#f8f6f2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px">📄</div>
+          <div style="width:64px;height:64px;background:#f8f6f2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px">📸</div>
+          <div style="width:64px;height:64px;background:#f8f6f2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#bbb;border:2px dashed #e0ddd8">+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')"><div class="icon">🏠</div><div class="label">홈</div></div>
+      <div class="nav-item"><div class="icon">✅</div><div class="label">타임라인</div></div>
+      <div class="nav-item"><div class="icon">💰</div><div class="label">예산</div></div>
+      <div class="nav-item active" onclick="showScreen('vendors')"><div class="icon">🏢</div><div class="label">업체</div></div>
+      <div class="nav-item"><div class="icon">⚙️</div><div class="label">더보기</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 6: TIMELINE ==================== -->
+  <div class="screen" id="screen-timeline">
+    <div class="px" style="padding-top:8px; padding-bottom:100px;">
+      <div style="font-size:20px;font-weight:800;margin-bottom:4px">✅ 타임라인</div>
+      <div style="font-size:12px;color:#999;margin-bottom:16px">8 / 44 완료 (18%)</div>
+      <div class="progress-bar" style="margin-bottom:20px">
+        <div class="progress-fill" style="width:18%;background:#1a1a18"></div>
+      </div>
+
+      <!-- 12 months before -->
+      <div class="month-header">12개월 전 <span class="month-badge">2026. 03</span> <span class="badge badge-green" style="font-size:10px">완료</span></div>
+      <div class="card-flat">
+        <div class="timeline-item">
+          <div class="tl-check done"></div>
+          <div class="tl-content">
+            <div class="tl-title done">예식 날짜 결정</div>
+            <div class="tl-sub">3/5 완료 · <span class="tl-assignee">둘 다</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check done"></div>
+          <div class="tl-content">
+            <div class="tl-title done">총 예산 설정</div>
+            <div class="tl-sub">3/5 완료 · <span class="tl-assignee">둘 다</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check done"></div>
+          <div class="tl-content">
+            <div class="tl-title done">웨딩홀 리서치 시작</div>
+            <div class="tl-sub">3/10 완료 · <span class="tl-assignee">신부</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 months before -->
+      <div class="month-header">9개월 전 <span class="month-badge">2026. 06</span> <span class="badge badge-amber" style="font-size:10px">진행중</span></div>
+      <div class="card-flat">
+        <div class="timeline-item">
+          <div class="tl-check done"></div>
+          <div class="tl-content">
+            <div class="tl-title done">웨딩홀 계약</div>
+            <div class="tl-sub">4/12 완료 · <span class="tl-assignee">둘 다</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check in-progress"></div>
+          <div class="tl-content">
+            <div class="tl-title">스드메 상담 / 비교</div>
+            <div class="tl-sub">진행중 · <span class="tl-assignee">신부</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check"></div>
+          <div class="tl-content">
+            <div class="tl-title">예복 매장 방문</div>
+            <div class="tl-sub">미시작 · <span class="tl-assignee">신랑</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check"></div>
+          <div class="tl-content">
+            <div class="tl-title">본식 스냅/영상 예약</div>
+            <div class="tl-sub">미시작 · <span class="tl-assignee">신부</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 months before -->
+      <div class="month-header">6개월 전 <span class="month-badge">2026. 09</span></div>
+      <div class="card-flat" style="opacity:.5">
+        <div class="timeline-item">
+          <div class="tl-check"></div>
+          <div class="tl-content"><div class="tl-title">예물 구매</div><div class="tl-sub"><span class="tl-assignee">둘 다</span></div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check"></div>
+          <div class="tl-content"><div class="tl-title">혼수 리스트 작성</div><div class="tl-sub"><span class="tl-assignee">신부</span></div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-check"></div>
+          <div class="tl-content"><div class="tl-title">신혼여행지 결정</div><div class="tl-sub"><span class="tl-assignee">둘 다</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fab">+</div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')"><div class="icon">🏠</div><div class="label">홈</div></div>
+      <div class="nav-item active"><div class="icon">✅</div><div class="label">타임라인</div></div>
+      <div class="nav-item" onclick="showScreen('budget')"><div class="icon">💰</div><div class="label">예산</div></div>
+      <div class="nav-item" onclick="showScreen('vendors')"><div class="icon">🏢</div><div class="label">업체</div></div>
+      <div class="nav-item"><div class="icon">⚙️</div><div class="label">더보기</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 7: ACTIVITY LOG ==================== -->
+  <div class="screen" id="screen-activity">
+    <div class="px" style="padding-top:8px; padding-bottom:100px;">
+      <div style="font-size:20px;font-weight:800;margin-bottom:16px">📋 활동 로그</div>
+
+      <div class="section-title">오늘</div>
+      <div class="card-flat">
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#E3F2FD;color:#1565C0">촨</div>
+          <div class="act-content">
+            <div class="act-text"><strong>촨근</strong>님이 <strong>더클래식500</strong> 견적을 수정했어요</div>
+            <div class="act-time">10분 전</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#FCE4EC;color:#C62828">서</div>
+          <div class="act-content">
+            <div class="act-text"><strong>서윤</strong>님이 <strong>웨딩홀 투어 3곳</strong>을 완료했어요 ✓</div>
+            <div class="act-time">2시간 전</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#FCE4EC;color:#C62828">서</div>
+          <div class="act-content">
+            <div class="act-text"><strong>서윤</strong>님이 업체 <strong>벨라주드레스</strong>를 추가했어요</div>
+            <div class="act-time">3시간 전</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">어제</div>
+      <div class="card-flat">
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#E3F2FD;color:#1565C0">촨</div>
+          <div class="act-content">
+            <div class="act-text"><strong>촨근</strong>님이 예산 항목 <strong>예복</strong>을 추가했어요</div>
+            <div class="act-time">어제 오후 8:30</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#FCE4EC;color:#C62828">서</div>
+          <div class="act-content">
+            <div class="act-text"><strong>서윤</strong>님이 <strong>로이스튜디오</strong> 상태를 <strong>견적받음</strong>으로 변경했어요</div>
+            <div class="act-time">어제 오후 3:15</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar" style="background:#E3F2FD;color:#1565C0">촨</div>
+          <div class="act-content">
+            <div class="act-text"><strong>촨근</strong>님이 파트너 초대를 수락했어요 🎉</div>
+            <div class="act-time">어제 오전 10:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')"><div class="icon">🏠</div><div class="label">홈</div></div>
+      <div class="nav-item" onclick="showScreen('timeline')"><div class="icon">✅</div><div class="label">타임라인</div></div>
+      <div class="nav-item" onclick="showScreen('budget')"><div class="icon">💰</div><div class="label">예산</div></div>
+      <div class="nav-item" onclick="showScreen('vendors')"><div class="icon">🏢</div><div class="label">업체</div></div>
+      <div class="nav-item active"><div class="icon">⚙️</div><div class="label">더보기</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
