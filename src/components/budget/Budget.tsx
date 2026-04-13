@@ -9,6 +9,8 @@ export default function Budget() {
   const [addTitle, setAddTitle] = useState('')
   const [addCat, setAddCat] = useState('wedding_hall')
   const [addAmount, setAddAmount] = useState('')
+  const [editingBudget, setEditingBudget] = useState(false)
+  const [budgetInput, setBudgetInput] = useState('')
   const { budget, vendors, profile } = data
   const items = budget.items || []
 
@@ -48,11 +50,12 @@ export default function Budget() {
 
       {/* 4-box */}
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="bg-white border border-stone-100 rounded-xl p-3 text-center">
-          <div className="text-[10px] font-semibold text-stone-400 mb-0.5">목표 예산</div>
+        <button onClick={() => { setBudgetInput(String(totalBudget)); setEditingBudget(true) }}
+          className="bg-white border border-stone-100 rounded-xl p-3 text-center">
+          <div className="text-[10px] font-semibold text-stone-400 mb-0.5">목표 예산 ✏️</div>
           <div className="text-xl font-extrabold">{fmt(totalBudget)}</div>
           <div className="text-[10px] text-stone-400">설정 총액</div>
-        </div>
+        </button>
         <div className="bg-white border border-stone-100 rounded-xl p-3 text-center">
           <div className="text-[10px] font-semibold text-stone-400 mb-0.5">확정 예산</div>
           <div className="text-xl font-extrabold">{fmt(confirmed)}</div>
@@ -147,6 +150,25 @@ export default function Budget() {
               }))
               setAddTitle(''); setAddAmount(''); setShowAdd(false)
             }} className="w-full py-3 bg-stone-900 text-white rounded-xl text-[14px] font-bold">추가</button>
+          </div>
+        </div>
+      )}
+
+      {/* Budget edit modal */}
+      {editingBudget && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center" onClick={() => setEditingBudget(false)}>
+          <div className="w-full max-w-[480px] bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="text-base font-bold mb-4">목표 예산 수정</div>
+            <input value={budgetInput} onChange={e => setBudgetInput(e.target.value)} placeholder="예: 40000000"
+              className="w-full p-4 border-2 border-stone-200 rounded-xl text-[15px] focus:border-stone-900 outline-none" />
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => setEditingBudget(false)} className="flex-1 py-3 text-[14px] font-semibold text-stone-400">취소</button>
+              <button onClick={() => {
+                const val = parseInt(budgetInput.replace(/[^0-9]/g, '')) || 0
+                if (val > 0) updateData(prev => ({ ...prev, profile: { ...prev.profile, totalBudget: val } }))
+                setEditingBudget(false)
+              }} className="flex-1 py-3 bg-stone-900 text-white rounded-xl text-[14px] font-bold">저장</button>
+            </div>
           </div>
         </div>
       )}

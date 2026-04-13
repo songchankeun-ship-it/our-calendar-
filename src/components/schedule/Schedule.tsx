@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { useWedding } from '../../contexts/WeddingContext'
-// import { VENDOR_CATEGORIES } from '../../types/wedding'
+import type { Assignee } from '../../types/wedding'
 
 export default function Schedule() {
   const { data, updateData } = useWedding()
   const [view, setView] = useState<'timeline' | 'checklist'>('timeline')
   const [filter, setFilter] = useState<string>('all')
+  const [showAdd, setShowAdd] = useState(false)
+  const [addTitle, setAddTitle] = useState('')
+  const [addAssignee, setAddAssignee] = useState<Assignee>('both')
+  const [addDue, setAddDue] = useState('')
   const timeline = data.timeline || []
   const vendors = data.vendors || []
 
@@ -170,6 +174,51 @@ export default function Schedule() {
           {filtered.length === 0 && <div className="text-center py-6 text-sm text-stone-400">해당하는 항목이 없어요</div>}
         </div>
       )}
+
+      {/* Add task modal */}
+      {showAdd && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center" onClick={() => setShowAdd(false)}>
+          <div className="w-full max-w-[480px] bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="text-base font-bold mb-4">할 일 추가</div>
+            <input value={addTitle} onChange={e => setAddTitle(e.target.value)} placeholder="할 일 (예: 예복 매장 방문)"
+              className="w-full p-3 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none mb-3" />
+            <input type="date" value={addDue} onChange={e => setAddDue(e.target.value)}
+              className="w-full p-3 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none mb-3" />
+            <div className="flex gap-2 mb-4">
+              {(['both', 'partner1', 'partner2'] as Assignee[]).map(a => (
+                <button key={a} onClick={() => setAddAssignee(a)}
+                  className={`flex-1 py-2.5 rounded-xl text-[12px] font-semibold border-2 transition ${addAssignee === a ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-200'}`}>
+                  {a === 'both' ? '둘 다' : a === 'partner1' ? (data.profile.partner1.role || '신부') : (data.profile.partner2.role || '신랑')}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => {
+              if (!addTitle.trim()) return
+              const dueDate = addDue || new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
+              const monthsBefore = data.profile.weddingDate
+                ? Math.max(0, Math.round((new Date(data.profile.weddingDate).getTime() - new Date(dueDate).getTime()) / (30 * 86400000)))
+                : 0
+              updateData(prev => ({
+                ...prev,
+                timeline: [...prev.timeline, {
+                  id: Math.random().toString(36).slice(2, 8),
+                  title: addTitle.trim(), category: 'general', monthsBefore,
+                  dueDate, status: 'todo', assignee: addAssignee,
+                  note: '', vendorId: '', budgetItemId: '', docIds: [],
+                  isCustom: true, completedAt: '', completedBy: 'both',
+                }]
+              }))
+              setAddTitle(''); setAddDue(''); setShowAdd(false)
+            }} className={`w-full py-3 rounded-xl text-[14px] font-bold transition ${addTitle.trim() ? 'bg-stone-900 text-white' : 'bg-stone-200 text-stone-400'}`}>
+              추가
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FAB */}
+      <button onClick={() => setShowAdd(true)}
+        className="absolute bottom-4 right-4 w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-lg z-40">+</button>
     </div>
   )
 }
