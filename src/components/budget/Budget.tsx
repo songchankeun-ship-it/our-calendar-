@@ -1,8 +1,14 @@
 import { useWedding } from '../../contexts/WeddingContext'
-import { BUDGET_CATEGORIES } from '../../types/wedding'
+import { BUDGET_CATEGORIES, type VendorCategory } from '../../types/wedding'
+
+import { useState } from 'react'
 
 export default function Budget() {
-  const { data } = useWedding()
+  const { data, updateData } = useWedding()
+  const [showAdd, setShowAdd] = useState(false)
+  const [addTitle, setAddTitle] = useState('')
+  const [addCat, setAddCat] = useState('wedding_hall')
+  const [addAmount, setAddAmount] = useState('')
   const { budget, vendors, profile } = data
   const items = budget.items || []
 
@@ -113,6 +119,41 @@ export default function Budget() {
           <div className="text-sm text-stone-400">업체를 등록하고 계약하면<br/>예산이 자동으로 반영돼요</div>
         </div>
       )}
+
+      {/* Add modal */}
+      {showAdd && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center" onClick={() => setShowAdd(false)}>
+          <div className="w-full max-w-[480px] bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="text-base font-bold mb-4">예산 항목 추가</div>
+            <input value={addTitle} onChange={e => setAddTitle(e.target.value)} placeholder="항목명 (예: 웨딩홀 대관료)"
+              className="w-full p-3 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none mb-3" />
+            <select value={addCat} onChange={e => setAddCat(e.target.value)}
+              className="w-full p-3 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none mb-3 bg-white">
+              {BUDGET_CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.emoji} {c.label}</option>)}
+            </select>
+            <input value={addAmount} onChange={e => setAddAmount(e.target.value)} placeholder="금액 (원)"
+              className="w-full p-3 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none mb-4" />
+            <button onClick={() => {
+              if (!addTitle.trim()) return
+              updateData(prev => ({
+                ...prev,
+                budget: { ...prev.budget, items: [...prev.budget.items, {
+                  id: Math.random().toString(36).slice(2,8), title: addTitle.trim(),
+                  category: addCat as VendorCategory, amount: parseInt(addAmount.replace(/[^0-9]/g,'')) || 0,
+                  status: 'estimated', deposit: 0, depositPaid: false, balance: 0,
+                  balanceDue: '', extras: 0, note: '', vendorId: '', createdBy: 'partner1',
+                  updatedAt: new Date().toISOString()
+                }]}
+              }))
+              setAddTitle(''); setAddAmount(''); setShowAdd(false)
+            }} className="w-full py-3 bg-stone-900 text-white rounded-xl text-[14px] font-bold">추가</button>
+          </div>
+        </div>
+      )}
+
+      {/* FAB */}
+      <button onClick={() => setShowAdd(true)}
+        className="absolute bottom-4 right-4 w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-lg z-40">+</button>
     </div>
   )
 }

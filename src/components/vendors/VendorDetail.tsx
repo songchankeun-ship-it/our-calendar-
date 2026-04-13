@@ -1,9 +1,16 @@
+import { useState } from 'react'
 import { useWedding } from '../../contexts/WeddingContext'
 import { VENDOR_CATEGORIES, VENDOR_STATUS_FLOW, type Vendor, type VendorStatus } from '../../types/wedding'
 
 export default function VendorDetail({ vendor: v, onBack }: { vendor: Vendor; onBack: () => void }) {
   const { data, updateData } = useWedding()
   const statusIdx = VENDOR_STATUS_FLOW.findIndex(s => s.key === v.status)
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [tempVal, setTempVal] = useState('')
+  const [showProsCons, setShowProsCons] = useState(false)
+  const [prosInput, setProsInput] = useState('')
+  const [consInput, setConsInput] = useState('')
+  const [concernsInput, setConcernsInput] = useState('')
 
   const setStatus = (status: VendorStatus) => {
     updateData(prev => ({
@@ -16,6 +23,61 @@ export default function VendorDetail({ vendor: v, onBack }: { vendor: Vendor; on
     updateData(prev => ({
       ...prev,
       vendors: prev.vendors.map(vn => vn.id === v.id ? { ...vn, [which]: val } : vn)
+    }))
+  }
+
+  const deleteVendor = () => {
+    if (!confirm(`"${v.name}" 업체를 삭제할까요?`)) return
+    updateData(prev => ({ ...prev, vendors: prev.vendors.filter(vn => vn.id !== v.id) }))
+    onBack()
+  }
+
+  const updateField = (field: string, value: string | number) => {
+    updateData(prev => ({
+      ...prev,
+      vendors: prev.vendors.map(vn => vn.id === v.id ? { ...vn, [field]: value, updatedAt: new Date().toISOString() } : vn)
+    }))
+  }
+
+  const editField = (field: string, current: string) => {
+    setEditingField(field)
+    setTempVal(current)
+  }
+
+  const saveField = () => {
+    if (!editingField) return
+    const numFields = ['quote', 'deposit', 'balance', 'extras']
+    const val = numFields.includes(editingField) ? parseInt(tempVal.replace(/[^0-9]/g, '')) || 0 : tempVal
+    updateField(editingField, val)
+    setEditingField(null)
+  }
+
+  const addProsCons = () => {
+    updateData(prev => ({
+      ...prev,
+      vendors: prev.vendors.map(vn => {
+        if (vn.id !== v.id) return vn
+        return {
+          ...vn,
+          pros: prosInput ? [...vn.pros, prosInput] : vn.pros,
+          cons: consInput ? [...vn.cons, consInput] : vn.cons,
+          concerns: concernsInput ? [...vn.concerns, concernsInput] : vn.concerns,
+        }
+      })
+    }))
+    setProsInput('')
+    setConsInput('')
+    setConcernsInput('')
+    setShowProsCons(false)
+  }
+
+  const removeProsCons = (type: 'pros' | 'cons' | 'concerns', idx: number) => {
+    updateData(prev => ({
+      ...prev,
+      vendors: prev.vendors.map(vn => {
+        if (vn.id !== v.id) return vn
+        return { ...vn, [type]: vn[type].filter((_: string, i: number) => i !== idx) }
+      })
     }))
   }
 
@@ -42,9 +104,10 @@ export default function VendorDetail({ vendor: v, onBack }: { vendor: Vendor; on
 
   return (
     <div className="pb-6 pt-2">
-      {/* Back */}
-      <div className="px-5 mb-2">
+      {/* Back + Delete */}
+      <div className="px-5 mb-2 flex justify-between items-center">
         <button onClick={onBack} className="text-[12px] text-stone-400">← 업체 목록</button>
+        <button onClick={deleteVendor} className="text-[12px] text-red-400 font-semibold">삭제</button>
       </div>
 
       {/* Header */}
@@ -86,36 +149,59 @@ export default function VendorDetail({ vendor: v, onBack }: { vendor: Vendor; on
       )}
 
       {/* Pros / Cons / Concerns */}
-      {(v.pros.length > 0 || v.cons.length > 0 || v.concerns.length > 0) && (
-        <div className="grid grid-cols-3 gap-1.5 mx-5 mt-4">
+      <div className="px-5 mt-4">
+        <div className="flex justify-between items-center mb-2">
+          <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">장점 / 단점 / 우려</div>
+          <button onClick={() => setShowProsCons(!showProsCons)} className="text-[11px] text-blue-600 font-semibold">
+            {showProsCons ? '닫기' : '+ 추가'}
+          </button>
+        </div>
+        {showProsCons && (
+          <div className="bg-stone-50 rounded-xl p-3 mb-3 space-y-2">
+            <input value={prosInput} onChange={e => setProsInput(e.target.value)} placeholder="장점 입력"
+              className="w-full p-2 border border-stone-200 rounded-lg text-[12px] outline-none focus:border-stone-900" />
+            <input value={consInput} onChange={e => setConsInput(e.target.value)} placeholder="단점 입력"
+              className="w-full p-2 border border-stone-200 rounded-lg text-[12px] outline-none focus:border-stone-900" />
+            <input value={concernsInput} onChange={e => setConcernsInput(e.target.value)} placeholder="우려 입력"
+              className="w-full p-2 border border-stone-200 rounded-lg text-[12px] outline-none focus:border-stone-900" />
+            <button onClick={addProsCons} className="w-full py-2 bg-stone-900 text-white rounded-lg text-[12px] font-bold">추가</button>
+          </div>
+        )}
+        <div className="grid grid-cols-3 gap-1.5">
           <div className="bg-stone-50 rounded-xl p-3">
             <div className="text-[10px] font-bold text-stone-400 mb-1.5">👍 장점</div>
-            {v.pros.map((p, i) => <div key={i} className="text-[11px] leading-relaxed">{p}</div>)}
+            {v.pros.map((p, i) => <div key={i} className="text-[11px] leading-relaxed flex justify-between">{p}<button onClick={() => removeProsCons('pros', i)} className="text-stone-300 text-[10px]">×</button></div>)}
+            {v.pros.length === 0 && <div className="text-[10px] text-stone-300">없음</div>}
           </div>
           <div className="bg-stone-50 rounded-xl p-3">
             <div className="text-[10px] font-bold text-stone-400 mb-1.5">👎 단점</div>
-            {v.cons.map((c, i) => <div key={i} className="text-[11px] leading-relaxed">{c}</div>)}
+            {v.cons.map((c, i) => <div key={i} className="text-[11px] leading-relaxed flex justify-between">{c}<button onClick={() => removeProsCons('cons', i)} className="text-stone-300 text-[10px]">×</button></div>)}
+            {v.cons.length === 0 && <div className="text-[10px] text-stone-300">없음</div>}
           </div>
           <div className="bg-stone-50 rounded-xl p-3">
             <div className="text-[10px] font-bold text-stone-400 mb-1.5">⚠️ 우려</div>
-            {v.concerns.map((c, i) => <div key={i} className="text-[11px] leading-relaxed">{c}</div>)}
+            {v.concerns.map((c, i) => <div key={i} className="text-[11px] leading-relaxed flex justify-between">{c}<button onClick={() => removeProsCons('concerns', i)} className="text-stone-300 text-[10px]">×</button></div>)}
+            {v.concerns.length === 0 && <div className="text-[10px] text-stone-300">없음</div>}
           </div>
         </div>
-      )}
+      </div>
 
       <div className="px-5 mt-4">
         {/* Basic info */}
         <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2">기본 정보</div>
         <div className="bg-white border border-stone-100 rounded-xl p-3 mb-4">
           {[
-            ['담당자', v.contactPerson],
-            ['연락처', v.contactPhone],
-            ['상담일', v.consultDate],
-            ['견적', v.quote > 0 ? `${(v.quote / 10000).toLocaleString()}만원` : '-'],
-          ].map(([l, val]) => (
-            <div key={l} className="flex justify-between py-2 border-b border-stone-50 last:border-0 text-[13px]">
+            ['contactPerson', '담당자', v.contactPerson],
+            ['contactPhone', '연락처', v.contactPhone],
+            ['consultDate', '상담일', v.consultDate],
+            ['quote', '견적', v.quote > 0 ? `${(v.quote / 10000).toLocaleString()}만원` : '-'],
+          ].map(([field, l, val]) => (
+            <div key={String(l)} className="flex justify-between py-2 border-b border-stone-50 last:border-0 text-[13px]">
               <span className="text-stone-400">{l}</span>
-              <span className="font-semibold">{val || '-'}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">{val || '-'}</span>
+                <button onClick={() => editField(String(field), String(field === 'quote' ? v.quote : val || ''))} className="text-[11px] text-blue-600">수정</button>
+              </div>
             </div>
           ))}
         </div>
@@ -204,13 +290,39 @@ export default function VendorDetail({ vendor: v, onBack }: { vendor: Vendor; on
         )}
 
         {/* Note */}
-        {v.note && (
-          <>
-            <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2">메모</div>
-            <div className="bg-stone-50 rounded-xl p-3 text-[12px] text-stone-600 leading-relaxed mb-4">{v.note}</div>
-          </>
-        )}
+        <div className="flex justify-between items-center mb-2">
+          <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">메모</div>
+          <button onClick={() => editField('note', v.note)} className="text-[11px] text-blue-600 font-semibold">수정</button>
+        </div>
+        <div className="bg-stone-50 rounded-xl p-3 text-[12px] text-stone-600 leading-relaxed mb-4">
+          {v.note || '메모를 추가해보세요'}
+        </div>
       </div>
+
+      {/* Edit modal */}
+      {editingField && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center" onClick={() => setEditingField(null)}>
+          <div className="w-full max-w-[480px] bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="text-base font-bold mb-4">
+              {editingField === 'contactPerson' ? '담당자' : editingField === 'contactPhone' ? '연락처' : editingField === 'consultDate' ? '상담일' : editingField === 'quote' ? '견적 (원)' : editingField === 'note' ? '메모' : editingField} 수정
+            </div>
+            {editingField === 'note' ? (
+              <textarea value={tempVal} onChange={e => setTempVal(e.target.value)} rows={4}
+                className="w-full p-4 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none resize-none" />
+            ) : editingField === 'consultDate' ? (
+              <input type="date" value={tempVal} onChange={e => setTempVal(e.target.value)}
+                className="w-full p-4 border-2 border-stone-200 rounded-xl text-[15px] focus:border-stone-900 outline-none" />
+            ) : (
+              <input value={tempVal} onChange={e => setTempVal(e.target.value)}
+                className="w-full p-4 border-2 border-stone-200 rounded-xl text-[15px] focus:border-stone-900 outline-none" />
+            )}
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => setEditingField(null)} className="flex-1 py-3 text-[14px] font-semibold text-stone-400">취소</button>
+              <button onClick={saveField} className="flex-1 py-3 bg-stone-900 text-white rounded-xl text-[14px] font-bold">저장</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
