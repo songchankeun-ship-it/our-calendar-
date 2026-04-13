@@ -39,7 +39,7 @@ export default function VendorAdd({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="pb-24 px-5 pt-2">
+    <div className="pb-6 px-5 pt-2">
       <button onClick={onBack} className="text-[12px] text-stone-400 mb-3">← 돌아가기</button>
       <div className="text-lg font-extrabold mb-4">업체 등록</div>
 

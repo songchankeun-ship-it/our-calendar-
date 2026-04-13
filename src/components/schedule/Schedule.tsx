@@ -64,7 +64,7 @@ export default function Schedule() {
   }
 
   return (
-    <div className="pb-24 px-5 pt-2">
+    <div className="pb-6 px-5 pt-2">
       <div className="text-lg font-extrabold mb-3">📅 일정</div>
 
       {/* Sub tabs */}

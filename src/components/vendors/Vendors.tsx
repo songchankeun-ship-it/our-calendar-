@@ -28,7 +28,7 @@ export default function Vendors() {
   vendors.forEach(v => { catCounts[v.category] = (catCounts[v.category] || 0) + 1 })
 
   return (
-    <div className="pb-24 px-5 pt-2">
+    <div className="pb-6 px-5 pt-2">
       <div className="text-lg font-extrabold mb-3">🏢 업체 관리</div>
 
       {/* Sub tabs */}
@@ -47,7 +47,7 @@ export default function Vendors() {
 
       {/* FAB */}
       <button onClick={() => setShowAdd(true)}
-        className="fixed bottom-24 right-[calc(50%-220px)] w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-lg z-40">+</button>
+        className="absolute bottom-4 right-4 w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-lg z-40">+</button>
 
       {/* Empty */}
       {vendors.length === 0 && (

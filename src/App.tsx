@@ -14,7 +14,11 @@ function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(!data.profile.weddingDate)
 
   if (showOnboarding) {
-    return <Onboarding onComplete={() => setShowOnboarding(false)} />
+    return (
+      <div className="max-w-[480px] mx-auto min-h-screen bg-[#FAFAF8]">
+        <Onboarding onComplete={() => setShowOnboarding(false)} />
+      </div>
+    )
   }
 
   const renderTab = () => {
@@ -29,8 +33,8 @@ function AppContent() {
   }
 
   return (
-    <div className="max-w-[480px] mx-auto min-h-screen relative bg-[#FAFAF8]">
-      <main>{renderTab()}</main>
+    <div className="max-w-[480px] mx-auto h-screen bg-[#FAFAF8] flex flex-col relative">
+      <main className="flex-1 overflow-y-auto">{renderTab()}</main>
       <BottomNav active={tab} onChange={setTab} />
     </div>
   )

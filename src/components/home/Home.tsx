@@ -2,7 +2,7 @@ import { useWedding } from '../../contexts/WeddingContext'
 import { BUDGET_CATEGORIES } from '../../types/wedding'
 
 export default function Home({ onTabChange }: { onTabChange: (tab: string) => void }) {
-  const { data } = useWedding()
+  const { data, updateData } = useWedding()
   const { profile, vendors, budget, timeline, activity } = data
 
   const daysLeft = profile.weddingDate
@@ -58,7 +58,7 @@ export default function Home({ onTabChange }: { onTabChange: (tab: string) => vo
   const recentActivity = (activity || []).slice(-5).reverse()
 
   return (
-    <div className="pb-24 px-5 pt-2">
+    <div className="pb-6 px-5 pt-2">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
@@ -122,7 +122,13 @@ export default function Home({ onTabChange }: { onTabChange: (tab: string) => vo
           <div className="bg-white border border-stone-100 rounded-xl p-3">
             {weekTasks.map(t => (
               <div key={t.id} className="flex items-center gap-3 py-2.5 border-b border-stone-50 last:border-0">
-                <div className={`w-[18px] h-[18px] rounded-full border-2 flex-shrink-0 ${t.status === 'done' ? 'bg-emerald-600 border-emerald-600' : t.status === 'in_progress' ? 'border-amber-400 bg-amber-50' : 'border-stone-300'}`} />
+                <button onClick={() => updateData(prev => ({
+                    ...prev,
+                    timeline: prev.timeline.map(item => item.id === t.id
+                      ? { ...item, status: item.status === 'done' ? 'todo' : 'done', completedAt: item.status === 'done' ? '' : new Date().toISOString() }
+                      : item)
+                  }))}
+                  className={`w-[18px] h-[18px] rounded-full border-2 flex-shrink-0 ${t.status === 'done' ? 'bg-emerald-600 border-emerald-600' : t.status === 'in_progress' ? 'border-amber-400 bg-amber-50' : 'border-stone-300'}`} />
                 <div className="flex-1">
                   <div className={`text-[13px] font-semibold ${t.status === 'done' ? 'line-through text-stone-300' : ''}`}>{t.title}</div>
                   <div className="text-[10px] text-stone-400 mt-0.5">

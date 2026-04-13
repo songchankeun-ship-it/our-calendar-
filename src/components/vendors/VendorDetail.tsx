@@ -41,7 +41,7 @@ export default function VendorDetail({ vendor: v, onBack }: { vendor: Vendor; on
     : null
 
   return (
-    <div className="pb-24 pt-2">
+    <div className="pb-6 pt-2">
       {/* Back */}
       <div className="px-5 mb-2">
         <button onClick={onBack} className="text-[12px] text-stone-400">← 업체 목록</button>

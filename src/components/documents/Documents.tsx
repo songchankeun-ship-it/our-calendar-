@@ -74,7 +74,7 @@ export default function Documents() {
   }
 
   return (
-    <div className="pb-24 px-5 pt-2">
+    <div className="pb-6 px-5 pt-2">
       <div className="flex justify-between items-center mb-3">
         <div className="text-lg font-extrabold">📁 문서함</div>
         <div className="text-[12px] text-stone-400 font-semibold">{(data.documents || []).length}개 문서</div>
@@ -134,7 +134,7 @@ export default function Documents() {
 
       {/* FAB */}
       <button onClick={handleUpload}
-        className="fixed bottom-24 right-[calc(50%-220px)] w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-lg z-40">+</button>
+        className="absolute bottom-4 right-4 w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-lg z-40">+</button>
     </div>
   )
 }

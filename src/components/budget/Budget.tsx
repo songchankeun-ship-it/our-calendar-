@@ -37,7 +37,7 @@ export default function Budget() {
   const fmt = (n: number) => `${(n / 10000).toLocaleString()}만`
 
   return (
-    <div className="pb-24 px-5 pt-2">
+    <div className="pb-6 px-5 pt-2">
       <div className="text-lg font-extrabold mb-3">💰 예산 관리</div>
 
       {/* 4-box */}

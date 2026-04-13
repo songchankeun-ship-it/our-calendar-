@@ -10,7 +10,7 @@ const TABS: { id: TabId; label: string; emoji: string }[] = [
 
 export default function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-stone-100 flex items-center justify-around pb-5 pt-2 z-50">
+    <nav className="shrink-0 bg-white border-t border-stone-100 flex items-center justify-around pb-5 pt-2">
       {TABS.map(t => (
         <button key={t.id} onClick={() => onChange(t.id)}
           className={`flex flex-col items-center gap-0.5 transition-opacity ${active === t.id ? 'opacity-100' : 'opacity-30'}`}>
