@@ -65,7 +65,7 @@ export default function Home({ onTabChange }: { onTabChange: (tab: string) => vo
           <div className="text-[11px] font-semibold text-stone-400">D-{daysLeft} · {dateStr}</div>
           <div className="text-lg font-extrabold mt-0.5">{profile.partner1.name || '나'} & {profile.partner2.name || '파트너'}</div>
         </div>
-        <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-sm">⚙️</div>
+        <button onClick={() => onTabChange('settings')} className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-sm">⚙️</button>
       </div>
 
       {/* Hero CTA */}
