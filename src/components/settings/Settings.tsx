@@ -8,6 +8,9 @@ export default function Settings({ onReset }: { onReset: () => void }) {
   const [tempVal, setTempVal] = useState('')
   const [showRoom, setShowRoom] = useState(false)
   const [roomInput, setRoomInput] = useState(roomName)
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [feedbackText, setFeedbackText] = useState('')
+  const [feedbackSent, setFeedbackSent] = useState(false)
 
   const daysLeft = profile.weddingDate
     ? Math.max(0, Math.floor((new Date(profile.weddingDate).getTime() - Date.now()) / 86400000))
@@ -123,6 +126,19 @@ export default function Settings({ onReset }: { onReset: () => void }) {
         </div>
       </div>
 
+      {/* Beta feedback */}
+      <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 mt-5">베타 피드백</div>
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+        <div className="text-[13px] font-bold text-amber-800 mb-1">🧪 베타 테스트 중!</div>
+        <div className="text-[12px] text-amber-700 leading-relaxed mb-3">
+          사용하면서 불편한 점, 추가됐으면 하는 기능, 좋았던 점 등 편하게 알려주세요.
+        </div>
+        <button onClick={() => setShowFeedback(true)}
+          className="w-full py-2.5 bg-amber-600 text-white rounded-xl text-[13px] font-bold">
+          피드백 보내기 💬
+        </button>
+      </div>
+
       {/* Reset */}
       <button onClick={resetApp}
         className="w-full mt-6 py-3 text-[13px] text-red-500 font-semibold">
@@ -148,6 +164,56 @@ export default function Settings({ onReset }: { onReset: () => void }) {
               <button onClick={() => setEditing(null)} className="flex-1 py-3 text-[14px] font-semibold text-stone-400">취소</button>
               <button onClick={saveEdit} className="flex-1 py-3 bg-stone-900 text-white rounded-xl text-[14px] font-bold">저장</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback modal */}
+      {showFeedback && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center" onClick={() => setShowFeedback(false)}>
+          <div className="w-full max-w-[480px] bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+            {feedbackSent ? (
+              <div className="text-center py-6">
+                <div className="text-4xl mb-3">🙏</div>
+                <div className="text-base font-bold mb-1">감사합니다!</div>
+                <div className="text-sm text-stone-400">피드백이 저장되었어요</div>
+                <button onClick={() => { setShowFeedback(false); setFeedbackSent(false) }}
+                  className="mt-4 px-6 py-2 bg-stone-900 text-white rounded-xl text-[13px] font-bold">닫기</button>
+              </div>
+            ) : (
+              <>
+                <div className="text-base font-bold mb-1">피드백 보내기 💬</div>
+                <div className="text-[12px] text-stone-400 mb-4">자유롭게 적어주세요 (불편한 점, 좋은 점, 추가 기능 등)</div>
+                <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} rows={4}
+                  placeholder="예: 업체 비교할 때 포함사항을 직접 입력하고 싶어요..."
+                  className="w-full p-4 border-2 border-stone-200 rounded-xl text-[14px] focus:border-stone-900 outline-none resize-none mb-3" />
+                <div className="flex gap-2 mb-3">
+                  {['😍 좋아요', '🤔 보통', '😅 아쉬워요'].map(opt => (
+                    <button key={opt} onClick={() => setFeedbackText(prev => prev ? prev + '\n\n만족도: ' + opt : '만족도: ' + opt)}
+                      className="flex-1 py-2 border border-stone-200 rounded-lg text-[11px] font-semibold hover:bg-stone-50">{opt}</button>
+                  ))}
+                </div>
+                <button onClick={() => {
+                  if (!feedbackText.trim()) return
+                  // Save feedback to Firebase
+                  updateData(prev => ({
+                    ...prev,
+                    activity: [...(prev.activity || []), {
+                      id: Math.random().toString(36).slice(2, 8),
+                      type: 'feedback', actor: 'partner1',
+                      actorName: prev.profile.partner1.name || 'Beta User',
+                      target: 'feedback',
+                      detail: feedbackText.trim(),
+                      timestamp: new Date().toISOString(),
+                    }]
+                  }))
+                  setFeedbackText('')
+                  setFeedbackSent(true)
+                }} className={`w-full py-3 rounded-xl text-[14px] font-bold ${feedbackText.trim() ? 'bg-stone-900 text-white' : 'bg-stone-200 text-stone-400'}`}>
+                  보내기
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
